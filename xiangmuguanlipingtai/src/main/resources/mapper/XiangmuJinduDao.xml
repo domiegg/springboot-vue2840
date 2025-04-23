@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.dao.XiangmuJinduDao">
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        a.id as id
+        ,a.xiangmu_id as xiangmuId
+        ,a.xiangmu_jindu_name as xiangmuJinduName
+        ,a.xiangmu_jindu_types as xiangmuJinduTypes
+        ,a.xiangmu_jindu_file as xiangmuJinduFile
+        ,a.xiangmu_jindu_content as xiangmuJinduContent
+        ,a.xiangmu_jindu_delete as xiangmuJinduDelete
+        ,a.insert_time as insertTime
+        ,a.create_time as createTime
+    </sql>
+    <select id="selectListView" parameterType="map" resultType="com.entity.view.XiangmuJinduView" >
+        SELECT
+        <include refid="Base_Column_List" />
+
+--         级联表的字段
+        ,xiangmu.yonghu_id as xiangmuYonghuId
+        ,xiangmu.xiangmu_uuid_number as xiangmuUuidNumber
+        ,xiangmu.xiangmu_name as xiangmuName
+        ,xiangmu.xiangmu_types as xiangmuTypes
+        ,xiangmu.xiangmu_file as xiangmuFile
+        ,xiangmu.xiangmu_content as xiangmuContent
+        ,xiangmu.xiangmu_zhuangtai_types as xiangmuZhuangtaiTypes
+        ,xiangmu.xiangmu_delete as xiangmuDelete
+
+        FROM xiangmu_jindu  a
+        left JOIN xiangmu xiangmu ON a.xiangmu_id = xiangmu.id
+
+        <where>
+            <if test="params.ids != null">
+                and a.id in
+                <foreach item="item" index="index" collection="params.ids" open="(" separator="," close=")">
+                #{item}
+                </foreach>
+            </if>
+            <if test="params.xiangmuId != null and params.xiangmuId != ''">
+                and (
+                    a.xiangmu_id = #{params.xiangmuId}
+                )
+            </if>
+            <if test=" params.xiangmuJinduName != '' and params.xiangmuJinduName != null and params.xiangmuJinduName != 'null' ">
+                and a.xiangmu_jindu_name like CONCAT('%',#{params.xiangmuJinduName},'%')
+            </if>
+            <if test="params.xiangmuJinduTypes != null and params.xiangmuJinduTypes != ''">
+                and a.xiangmu_jindu_types = #{params.xiangmuJinduTypes}
+            </if>
+            <if test=" params.xiangmuJinduContent != '' and params.xiangmuJinduContent != null and params.xiangmuJinduContent != 'null' ">
+                and a.xiangmu_jindu_content like CONCAT('%',#{params.xiangmuJinduContent},'%')
+            </if>
+            <if test="params.xiangmuJinduDeleteStart != null and params.xiangmuJinduDeleteStart != ''">
+                <![CDATA[  and a.xiangmu_jindu_delete >= #{params.xiangmuJinduDeleteStart}   ]]>
+            </if>
+            <if test="params.xiangmuJinduDeleteEnd != null and params.xiangmuJinduDeleteEnd != ''">
+                <![CDATA[  and a.xiangmu_jindu_delete <= #{params.xiangmuJinduDeleteEnd}   ]]>
+            </if>
+             <if test="params.xiangmuJinduDelete != null and params.xiangmuJinduDelete != ''">
+                and a.xiangmu_jindu_delete = #{params.xiangmuJinduDelete}
+             </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(a.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+
+                <!-- 判断项目的id不为空 -->
+            <if test=" params.xiangmuIdNotNull != '' and params.xiangmuIdNotNull != null and params.xiangmuIdNotNull != 'null' ">
+                and a.xiangmu_id IS NOT NULL
+            </if>
+            <if test="params.yonghuId != null  and params.yonghuId != ''">
+                and xiangmu.yonghu_id = #{params.yonghuId}
+            </if>
+            <if test=" params.xiangmuUuidNumber != '' and params.xiangmuUuidNumber != null and params.xiangmuUuidNumber != 'null' ">
+                and xiangmu.xiangmu_uuid_number like CONCAT('%',#{params.xiangmuUuidNumber},'%')
+            </if>
+            <if test=" params.xiangmuName != '' and params.xiangmuName != null and params.xiangmuName != 'null' ">
+                and xiangmu.xiangmu_name like CONCAT('%',#{params.xiangmuName},'%')
+            </if>
+            <if test="params.xiangmuTypes != null  and params.xiangmuTypes != ''">
+                and xiangmu.xiangmu_types = #{params.xiangmuTypes}
+            </if>
+
+            <if test=" params.xiangmuContent != '' and params.xiangmuContent != null and params.xiangmuContent != 'null' ">
+                and xiangmu.xiangmu_content like CONCAT('%',#{params.xiangmuContent},'%')
+            </if>
+            <if test="params.xiangmuZhuangtaiTypes != null  and params.xiangmuZhuangtaiTypes != ''">
+                and xiangmu.xiangmu_zhuangtai_types = #{params.xiangmuZhuangtaiTypes}
+            </if>
+
+            <if test="params.xiangmuDeleteStart != null  and params.xiangmuDeleteStart != '' ">
+                <![CDATA[  and xiangmu.xiangmu_delete >= #{params.xiangmuDeleteStart}   ]]>
+            </if>
+            <if test="params.xiangmuDeleteEnd != null  and params.xiangmuDeleteEnd != '' ">
+                <![CDATA[  and xiangmu.xiangmu_delete <= #{params.xiangmuDeleteEnd}   ]]>
+            </if>
+            <if test="params.xiangmuDelete != null  and params.xiangmuDelete != '' ">
+                and xiangmu.xiangmu_delete = #{params.xiangmuDelete}
+            </if>
+            <if test=" params.insertTimeStart != '' and params.insertTimeStart != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xiangmu.insert_time) >= UNIX_TIMESTAMP(#{params.insertTimeStart}) ]]>
+            </if>
+            <if test=" params.insertTimeEnd != '' and params.insertTimeEnd != null ">
+                <![CDATA[  and UNIX_TIMESTAMP(xiangmu.insert_time) <= UNIX_TIMESTAMP(#{params.insertTimeEnd}) ]]>
+            </if>
+        </where>
+
+        order by a.${params.orderBy} desc 
+    </select>
+
+</mapper>
